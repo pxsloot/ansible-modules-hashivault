@@ -118,6 +118,7 @@ EXAMPLES = '''
 def main():
     # separate long default value to pass linting
     default_group_filter = '(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}}))'
+    default_user_filter = '({{.UserAttr}}={{.Username}})'
     argspec = hashivault_argspec()
     argspec['description'] = dict(required=False, type='str')
     argspec['mount_point'] = dict(required=False, type='str', default='ldap')
@@ -131,6 +132,7 @@ def main():
     argspec['bind_dn'] = dict(required=False, type='str', default='')
     argspec['bind_pass'] = dict(required=False, type='str', default=None, no_log=True)
     argspec['user_attr'] = dict(required=False, type='str', default='cn')
+    argspec['user_filter'] = dict(required=False, type='str', default=default_user_filter)
     argspec['user_dn'] = dict(required=False, type='str', default='')
     argspec['discover_dn'] = dict(required=False, type='bool', default=False)
     argspec['deny_null_bind'] = dict(required=False, type='bool', default=True)
@@ -167,6 +169,7 @@ def hashivault_auth_ldap(module):
     desired_state['bind_dn'] = params.get('bind_dn')
     desired_state['bind_pass'] = params.get('bind_pass')
     desired_state['user_attr'] = params.get('user_attr')
+    desired_state['user_filter'] = params.get('user_filter')
     desired_state['user_dn'] = params.get('user_dn')
     desired_state['discover_dn'] = params.get('discover_dn')
     desired_state['deny_null_bind'] = params.get('deny_null_bind')
@@ -191,6 +194,7 @@ def hashivault_auth_ldap(module):
         current_state['discover_dn'] = result['discoverdn']
         current_state['group_attr'] = result['groupattr']
         current_state['user_attr'] = result['userattr']
+        current_state['user_filter'] = result['userfilter']
         current_state['group_dn'] = result['groupdn']
         current_state['upn_domain'] = result['upndomain']
         current_state['group_filter'] = result['groupfilter']
