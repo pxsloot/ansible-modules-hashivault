@@ -47,6 +47,7 @@ options:
             - Specifies the database statements to be executed to rotate the root user's credentials. See the plugin's
               API page for more information on support and formatting for this parameter.
         default: []
+        aliases: [ root_rotation_statements ]
     password_policy:
         description:
             - The name of the password policy to use when generating passwords for this database. If not specified,
@@ -82,10 +83,11 @@ def main():
     argspec['config_file'] = dict(required=False, type='str', default=None)
     argspec['plugin_name'] = dict(required=False, type='str')
     argspec['allowed_roles'] = dict(required=False, type='list', default=[])
-    argspec['root_credentials_rotate_statements'] = dict(required=False, type='list', default=[])
+    argspec['root_credentials_rotate_statements'] = dict(required=False, type='list',
+                                                         aliases=['root_rotation_statements'], default=[])
     argspec['verify_connection'] = dict(required=False, type='bool', default=True)
-    argspec['connection_details'] = dict(required=True, type='dict')
-    argspec['password_policy'] = dict(required=False, type='str')
+    argspec['connection_details'] = dict(required=True, type='dict', no_log=True)
+    argspec['password_policy'] = dict(required=False, type='str', no_log=True, default='')
     required_one_of = [['config_file', 'connection_details']]
 
     module = hashivault_init(argspec, supports_check_mode=True, required_one_of=required_one_of)
@@ -115,19 +117,19 @@ def hashivault_db_secret_engine_config(module):
         desired_state['allowed_roles'] = params.get('allowed_roles')
         desired_state['verify_connection'] = params.get('verify_connection')
         desired_state['password_policy'] = params.get('password_policy')
-        desired_state['root_credentials_rotate_statements'] = params.get('root_credentials_rotate_statements')
+        desired_state['root_rotation_statements'] = params.get('root_credentials_rotate_statements')
         connection_details = params.get('connection_details')
         desired_state.update(connection_details)
         del connection_details["password"]
 
     # not a required param but must ensure a value for current vs desired object comparison
-    if 'root_credentials_rotate_statements' not in desired_state:
-        desired_state['root_credentials_rotate_statements'] = []
+    if 'root_rotation_statements' not in desired_state:
+        desired_state['root_rotation_statements'] = []
 
     exists = False
     current_state = {}
     try:
-        current_state = client.secrets.database.read_connection(name=name)
+        current_state = client.secrets.database.read_connection(name=name, mount_point=mount_point)
         exists = True
     except Exception:
         # does not exist
@@ -145,9 +147,11 @@ def hashivault_db_secret_engine_config(module):
                         changed = True
                     if v['connection_url'] != desired_state['connection_url']:
                         changed = True
-                else:
-                    if v != desired_state[k]:
+                elif k == 'root_credentials_rotate_statements':
+                    if v != desired_state['root_rotation_statements']:
                         changed = True
+                elif v != desired_state[k]:
+                    changed = True
     elif state == 'present':
         changed = True
 

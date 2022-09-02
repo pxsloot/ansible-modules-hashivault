@@ -2,6 +2,44 @@ Changelog
 =========
 
 
+4.7.0 (2022-06-19)
+------------------
+- Add a hashivault_ssh_role_list module. [Szymon Soloch]
+- Add a hashivault_ssh_role module. [Szymon Soloch]
+- Add a hashivault_token_role_list module. [Szymon Soloch]
+- Add a hashivault_token_role module. [Szymon Soloch]
+- Get better auth method tests. [Terry Howe]
+- Fix auth_method idempotency. [ayav09]
+- Fix tests. [Terry Howe]
+- Fix docs build. [Terry Howe]
+- Fix state comparison of lists. [Jarno Antikainen]
+
+
+4.6.8 (2022-02-19)
+------------------
+- Allow create nonexistent secret when state is update. [Pavel Ezhov]
+
+
+4.6.7 (2022-02-08)
+------------------
+- Fix db_secret_engine_config idempotency for password policy and non-
+  default mount point. [ayav09]
+- Fix hashivault_db_secret_engine_role delete idempotency. [ayav09]
+- Readme updates. [ayav09]
+- Specify type for states. [Terry Howe]
+
+
+4.6.6 (2022-02-06)
+------------------
+- Set no_log for a few things. [Terry Howe]
+- Pep8 fixes. [ayav09]
+- Fix root rotation statements in connection details. [ayav09]
+- Remove unneeded lstrip. [Terry Howe]
+- Fix hashivault_list URL with lstrip. [Gregory Fredj]
+
+  Right now it is using `lstrip('metadata/')` and if the path contains any letter in "metadata" it will be removed. lstrip() isn't the function to use but rather replace and only once.
+
+
 4.6.5 (2022-01-11)
 ------------------
 - Return secret version when reading kv v2 secret. [Albin Kerouanton]

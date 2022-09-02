@@ -40,19 +40,23 @@ options:
             - name of the db configuration youre referencing. in my opinion, this should be called 'db connection' but
               hashi calls it db_name
     creation_statements:
+        type: list
         description:
             - "Specifies the database statements executed to create and configure a user. make sure your account for
               variables like this {{'{{name}}'}}"
     revocation_statements:
+        type: list
         description:
             - Specifies the database statements to be executed to revoke a user. See the plugin's API page for more
               information on support and formatting for this parameter.
     rollback_statements:
+        type: list
         description:
             - Specifies the database statements to be executed rollback a create operation in the event of an error. Not
               every plugin type will support this functionality. See the plugin's API page for more information on
               support and formatting for this parameter.
     renew_statements:
+        type: list
         description:
             - Specifies the database statements to be executed to renew a user. Not every plugin type will support this
               functionality. See the plugin's API page for more information on support and formatting for this
@@ -127,7 +131,6 @@ def hashivault_db_secret_engine_role(module):
         client.secrets.database.read_role(name=name, mount_point=mount_point)
         exists = True
     except Exception:
-        changed = True
         pass
 
     if (exists and state == 'absent') or (not exists and state == 'present'):
